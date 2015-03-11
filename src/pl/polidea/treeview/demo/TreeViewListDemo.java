@@ -26,31 +26,28 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
  * 
  */
 public class TreeViewListDemo extends Activity {
-    private enum TreeType implements Serializable {
+    private enum AdapterType implements Serializable {
         SIMPLE,
         FANCY
     }
-
-    private final Set<Long> selected = new HashSet<Long>();
-
-    private static final String TAG = TreeViewListDemo.class.getSimpleName();
-    private TreeViewList treeView;
-
+    
+    private static final AdapterType DEMO_ADAPTER = AdapterType.SIMPLE;
+    private static final boolean DEMO_COLLAPSIBLE = true;
     private static final int[] DEMO_NODES = new int[] { 0, 0, 1, 1, 1, 2, 2, 1,
-            1, 2, 1, 0, 0, 0, 1, 2, 3, 2, 0, 0, 1, 2, 0, 1, 2, 0, 1 };
+        1, 2, 1, 0, 0, 0, 1, 2, 3, 2, 0, 0, 1, 2, 0, 1, 2, 0, 1 };
     private static final int LEVEL_NUMBER = 4;
+    private static final Set<Long> DEMO_SELECTED = new HashSet<Long>();
+    private static final String TAG = TreeViewListDemo.class.getSimpleName();
+    
+    private TreeViewList treeView;
     private TreeStateManager<Long> manager = null;
     private FancyColouredVariousSizesAdapter fancyAdapter;
     private SimpleStandardAdapter simpleAdapter;
-    private TreeType treeType;
-    private boolean collapsible;
 
     @SuppressWarnings("unchecked")
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TreeType newTreeType = null;
-        boolean newCollapsible;
         if (savedInstanceState == null) {
             manager = new InMemoryTreeStateManager<Long>();
             final TreeBuilder<Long> treeBuilder = new TreeBuilder<Long>(manager);
@@ -58,42 +55,31 @@ public class TreeViewListDemo extends Activity {
                 treeBuilder.sequentiallyAddNextNode((long) i, DEMO_NODES[i]);
             }
             Log.d(TAG, manager.toString());
-            newTreeType = TreeType.SIMPLE;
-            newCollapsible = true;
         } else {
             manager = (TreeStateManager<Long>) savedInstanceState
                     .getSerializable("treeManager");
             if (manager == null) {
                 manager = new InMemoryTreeStateManager<Long>();
             }
-            newTreeType = (TreeType) savedInstanceState
-                    .getSerializable("treeType");
-            if (newTreeType == null) {
-                newTreeType = TreeType.SIMPLE;
-            }
-            newCollapsible = savedInstanceState.getBoolean("collapsible");
         }
         setContentView(R.layout.main_demo);
         treeView = (TreeViewList) findViewById(R.id.mainTreeView);
-        fancyAdapter = new FancyColouredVariousSizesAdapter(this, selected,
+        fancyAdapter = new FancyColouredVariousSizesAdapter(this, DEMO_SELECTED,
                 manager, LEVEL_NUMBER);
-        simpleAdapter = new SimpleStandardAdapter(this, selected, manager,
+        simpleAdapter = new SimpleStandardAdapter(this, DEMO_SELECTED, manager,
                 LEVEL_NUMBER);
-        setTreeAdapter(newTreeType);
-        setCollapsible(newCollapsible);
+        setTreeAdapter(DEMO_ADAPTER);
+        treeView.setCollapsible(DEMO_COLLAPSIBLE);
         registerForContextMenu(treeView);
     }
 
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         outState.putSerializable("treeManager", manager);
-        outState.putSerializable("treeType", treeType);
-        outState.putBoolean("collapsible", this.collapsible);
         super.onSaveInstanceState(outState);
     }
 
-    protected final void setTreeAdapter(final TreeType newTreeType) {
-        this.treeType = newTreeType;
+    protected final void setTreeAdapter(final AdapterType newTreeType) {
         switch (newTreeType) {
         case SIMPLE:
             treeView.setAdapter(simpleAdapter);
@@ -105,12 +91,7 @@ public class TreeViewListDemo extends Activity {
             treeView.setAdapter(simpleAdapter);
         }
     }
-
-    protected final void setCollapsible(final boolean newCollapsible) {
-        this.collapsible = newCollapsible;
-        treeView.setCollapsible(this.collapsible);
-    }
-
+    
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         final MenuInflater inflater = getMenuInflater();
@@ -122,7 +103,7 @@ public class TreeViewListDemo extends Activity {
     public boolean onPrepareOptionsMenu(final Menu menu) {
         final MenuItem collapsibleMenu = menu
                 .findItem(R.id.collapsible_menu_item);
-        if (collapsible) {
+        if (DEMO_COLLAPSIBLE) {
             collapsibleMenu.setTitle(R.string.collapsible_menu_disable);
             collapsibleMenu.setTitleCondensed(getResources().getString(
                     R.string.collapsible_condensed_disable));
@@ -137,11 +118,11 @@ public class TreeViewListDemo extends Activity {
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if (item.getItemId() == R.id.simple_menu_item) {
-            setTreeAdapter(TreeType.SIMPLE);
+            setTreeAdapter(AdapterType.SIMPLE);
         } else if (item.getItemId() == R.id.fancy_menu_item) {
-            setTreeAdapter(TreeType.FANCY);
+            setTreeAdapter(AdapterType.FANCY);
         } else if (item.getItemId() == R.id.collapsible_menu_item) {
-            setCollapsible(!this.collapsible);
+            treeView.setCollapsible(!DEMO_COLLAPSIBLE); //TODO fix this
         } else if (item.getItemId() == R.id.expand_all_menu_item) {
             manager.expandEverythingBelow(null);
         } else if (item.getItemId() == R.id.collapse_all_menu_item) {
