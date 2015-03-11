@@ -103,7 +103,7 @@ public class TreeViewListDemo extends Activity {
     public boolean onPrepareOptionsMenu(final Menu menu) {
         final MenuItem collapsibleMenu = menu
                 .findItem(R.id.collapsible_menu_item);
-        if (DEMO_COLLAPSIBLE) {
+        if (treeView.isCollapsible()) {
             collapsibleMenu.setTitle(R.string.collapsible_menu_disable);
             collapsibleMenu.setTitleCondensed(getResources().getString(
                     R.string.collapsible_condensed_disable));
@@ -122,7 +122,7 @@ public class TreeViewListDemo extends Activity {
         } else if (item.getItemId() == R.id.fancy_menu_item) {
             setTreeAdapter(AdapterType.FANCY);
         } else if (item.getItemId() == R.id.collapsible_menu_item) {
-            treeView.setCollapsible(!DEMO_COLLAPSIBLE); //TODO fix this
+            treeView.setCollapsible(!treeView.isCollapsible());
         } else if (item.getItemId() == R.id.expand_all_menu_item) {
             manager.expandEverythingBelow(null);
         } else if (item.getItemId() == R.id.collapse_all_menu_item) {
