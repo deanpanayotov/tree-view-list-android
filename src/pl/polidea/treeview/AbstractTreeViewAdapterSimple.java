@@ -7,7 +7,6 @@ import android.database.DataSetObserver;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
@@ -27,15 +26,6 @@ public abstract class AbstractTreeViewAdapterSimple<T> extends BaseAdapter imple
     private final LayoutInflater layoutInflater;
 
     private int indentWidth = 0;
-
-    private final OnClickListener clickListener = new OnClickListener() {
-        @Override
-        public void onClick(final View v) {
-            @SuppressWarnings("unchecked")
-            final T id = (T) v.getTag();
-            expandCollapse(id);
-        }
-    };
 
     private boolean collapsible;
     private final Activity activity;
