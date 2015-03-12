@@ -151,7 +151,7 @@ public abstract class AbstractTreeViewAdapterSimple<T> extends BaseAdapter imple
     }
 
     protected int getTreeListItemWrapperId() {
-        return R.layout.tree_list_item_wrapper;
+        return R.layout.tree_list_item_wrapper_bare;
     }
 
     @Override
