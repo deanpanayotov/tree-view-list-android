@@ -36,7 +36,7 @@ public class TreeViewList extends ListView {
     private Drawable indicatorBackgroundDrawable;
     private int indentWidth = 0;
     private int indicatorGravity = 0;
-    private AbstractTreeViewAdapter< ? > treeAdapter;
+    private AbstractTreeViewAdapterSimple<?> treeAdapter;
     private boolean collapsible;
     private boolean handleTrackballPress;
 
@@ -83,11 +83,11 @@ public class TreeViewList extends ListView {
 
     @Override
     public void setAdapter(final ListAdapter adapter) {
-        if (!(adapter instanceof AbstractTreeViewAdapter)) {
+        if (!(adapter instanceof AbstractTreeViewAdapterSimple)) {
             throw new TreeConfigurationException(
                     "The adapter is not of TreeViewAdapter type");
         }
-        treeAdapter = (AbstractTreeViewAdapter< ? >) adapter;
+        treeAdapter = (AbstractTreeViewAdapterSimple<?>) adapter;
         syncAdapter();
         super.setAdapter(treeAdapter);
     }

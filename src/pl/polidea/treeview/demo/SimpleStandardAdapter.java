@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 import pl.polidea.treeview.AbstractTreeViewAdapter;
+import pl.polidea.treeview.AbstractTreeViewAdapterSimple;
 import pl.polidea.treeview.R;
 import pl.polidea.treeview.TreeNodeInfo;
 import pl.polidea.treeview.TreeStateManager;
@@ -17,7 +18,7 @@ import android.widget.TextView;
  * This is a very simple adapter that provides very basic tree view with simple item description.
  * 
  */
-class SimpleStandardAdapter extends AbstractTreeViewAdapter<Long> {
+class SimpleStandardAdapter extends AbstractTreeViewAdapterSimple<Long> {
 
     private final Set<Long> selected;
 
