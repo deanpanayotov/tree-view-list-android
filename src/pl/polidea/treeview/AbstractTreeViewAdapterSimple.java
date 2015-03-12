@@ -1,18 +1,17 @@
 package pl.polidea.treeview;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
-import android.widget.FrameLayout.LayoutParams;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 
@@ -29,13 +28,8 @@ public abstract class AbstractTreeViewAdapterSimple<T> extends BaseAdapter imple
     private final LayoutInflater layoutInflater;
 
     private int indentWidth = 0;
-    private int indicatorGravity = 0;
-    private Drawable collapsedDrawable;
-    private Drawable expandedDrawable;
-    private Drawable indicatorBackgroundDrawable;
-    private Drawable rowBackgroundDrawable;
 
-    private final OnClickListener indicatorClickListener = new OnClickListener() {
+    private final OnClickListener clickListener = new OnClickListener() {
         @Override
         public void onClick(final View v) {
             @SuppressWarnings("unchecked")
@@ -68,17 +62,6 @@ public abstract class AbstractTreeViewAdapterSimple<T> extends BaseAdapter imple
         }
     }
 
-    private void calculateIndentWidth() {
-        if (expandedDrawable != null) {
-            indentWidth = Math.max(getIndentWidth(),
-                    expandedDrawable.getIntrinsicWidth());
-        }
-        if (collapsedDrawable != null) {
-            indentWidth = Math.max(getIndentWidth(),
-                    collapsedDrawable.getIntrinsicWidth());
-        }
-    }
-
     public AbstractTreeViewAdapterSimple(final Activity activity,
             final TreeStateManager<T> treeStateManager, final int numberOfLevels) {
         this.activity = activity;
@@ -86,10 +69,6 @@ public abstract class AbstractTreeViewAdapterSimple<T> extends BaseAdapter imple
         this.layoutInflater = (LayoutInflater) activity
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.numberOfLevels = numberOfLevels;
-        this.collapsedDrawable = null;
-        this.expandedDrawable = null;
-        this.rowBackgroundDrawable = null;
-        this.indicatorBackgroundDrawable = null;
     }
 
     @Override
@@ -195,104 +174,49 @@ public abstract class AbstractTreeViewAdapterSimple<T> extends BaseAdapter imple
      * @return view to used as row indented content
      */
     public abstract View updateView(View view, TreeNodeInfo<T> treeNodeInfo);
-
-    /**
-     * Retrieves background drawable for the node.
-     * 
-     * @param treeNodeInfo
-     *            node info
-     * @return drawable returned as background for the whole row. Might be null,
-     *         then default background is used
-     */
-    public Drawable getBackgroundDrawable(final TreeNodeInfo<T> treeNodeInfo) { // NOPMD
+    
+    protected Drawable getBackgroundDrawable(TreeNodeInfo<T> nodeInfo){
         return null;
     }
-
-    private Drawable getDrawableOrDefaultBackground(final Drawable r) {
-        if (r == null) {
-            return activity.getResources()
-                    .getDrawable(R.drawable.list_selector_background).mutate();
-        } else {
-            return r;
-        }
+    
+    protected int getBackgroundResourceId(TreeNodeInfo<T> nodeInfo){
+        return 0;
     }
 
+    @SuppressLint("NewApi")
     public final LinearLayout populateTreeItem(final LinearLayout layout,
             final View childView, final TreeNodeInfo<T> nodeInfo,
             final boolean newChildView) {
-        final Drawable individualRowDrawable = getBackgroundDrawable(nodeInfo);
-        layout.setBackgroundDrawable(individualRowDrawable == null ? getDrawableOrDefaultBackground(rowBackgroundDrawable)
-                : individualRowDrawable);
-        final LinearLayout.LayoutParams indicatorLayoutParams = new LinearLayout.LayoutParams(
-                calculateIndentation(nodeInfo), LayoutParams.FILL_PARENT);
-        final LinearLayout indicatorLayout = (LinearLayout) layout
-                .findViewById(R.id.treeview_list_item_image_layout);
-        indicatorLayout.setGravity(indicatorGravity);
-        indicatorLayout.setLayoutParams(indicatorLayoutParams);
-        final ImageView image = (ImageView) layout
-                .findViewById(R.id.treeview_list_item_image);
-        image.setImageDrawable(getDrawable(nodeInfo));
-        image.setBackgroundDrawable(getDrawableOrDefaultBackground(indicatorBackgroundDrawable));
-        image.setScaleType(ScaleType.CENTER);
-        image.setTag(nodeInfo.getId());
-        if (nodeInfo.isWithChildren() && collapsible) {
-            image.setOnClickListener(indicatorClickListener);
-        } else {
-            image.setOnClickListener(null);
+        if(getBackgroundDrawable(nodeInfo) != null){
+            int sdk = android.os.Build.VERSION.SDK_INT;
+            if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                layout.setBackgroundDrawable(getBackgroundDrawable(nodeInfo));
+            } else {
+                layout.setBackground(getBackgroundDrawable(nodeInfo));
+            }
+        } else if (getBackgroundResourceId(nodeInfo) != 0){
+            layout.setBackgroundResource(getBackgroundResourceId(nodeInfo));
         }
-        layout.setTag(nodeInfo.getId());
+        layout.setPadding(calculateIndentation(nodeInfo), 0, 0, 0);
+        layout.setTag(nodeInfo.getId()); //TODO is this used?
         final FrameLayout frameLayout = (FrameLayout) layout
                 .findViewById(R.id.treeview_list_item_frame);
-        final FrameLayout.LayoutParams childParams = new FrameLayout.LayoutParams(
-                LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
         if (newChildView) {
-            frameLayout.addView(childView, childParams);
+            frameLayout.addView(childView);
         }
-        frameLayout.setTag(nodeInfo.getId());
+        frameLayout.setTag(nodeInfo.getId()); //TODO is this used?
         return layout;
     }
 
     protected int calculateIndentation(final TreeNodeInfo<T> nodeInfo) {
-        return getIndentWidth() * (nodeInfo.getLevel() + (collapsible ? 1 : 0));
-    }
-
-    protected Drawable getDrawable(final TreeNodeInfo<T> nodeInfo) {
-        if (!nodeInfo.isWithChildren() || !collapsible) {
-            return getDrawableOrDefaultBackground(indicatorBackgroundDrawable);
-        }
-        if (nodeInfo.isExpanded()) {
-            return expandedDrawable;
-        } else {
-            return collapsedDrawable;
-        }
-    }
-
-    public void setIndicatorGravity(final int indicatorGravity) {
-        this.indicatorGravity = indicatorGravity;
-    }
-
-    public void setCollapsedDrawable(final Drawable collapsedDrawable) {
-        this.collapsedDrawable = collapsedDrawable;
-        calculateIndentWidth();
-    }
-
-    public void setExpandedDrawable(final Drawable expandedDrawable) {
-        this.expandedDrawable = expandedDrawable;
-        calculateIndentWidth();
+        int width = getIndentWidth() * (nodeInfo.getLevel() + (collapsible ? 1 : 0));
+        Log.d("test", "getIndentWidth: "+getIndentWidth()+"w: "+width);
+        return width;
     }
 
     public void setIndentWidth(final int indentWidth) {
+        Log.d("test", "AbstractTreeViewAdapterSimple.setIndentWidth "+indentWidth);
         this.indentWidth = indentWidth;
-        calculateIndentWidth();
-    }
-
-    public void setRowBackgroundDrawable(final Drawable rowBackgroundDrawable) {
-        this.rowBackgroundDrawable = rowBackgroundDrawable;
-    }
-
-    public void setIndicatorBackgroundDrawable(
-            final Drawable indicatorBackgroundDrawable) {
-        this.indicatorBackgroundDrawable = indicatorBackgroundDrawable;
     }
 
     public void setCollapsible(final boolean collapsible) {

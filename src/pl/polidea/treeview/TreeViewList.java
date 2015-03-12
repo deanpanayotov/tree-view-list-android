@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,7 +28,7 @@ import android.widget.ListView;
 public class TreeViewList extends ListView {
     private static final int DEFAULT_COLLAPSED_RESOURCE = R.drawable.collapsed;
     private static final int DEFAULT_EXPANDED_RESOURCE = R.drawable.expanded;
-    private static final int DEFAULT_INDENT = 0;
+    private static final int DEFAULT_INDENT = 60; //TODO dp
     private static final int DEFAULT_GRAVITY = Gravity.LEFT
             | Gravity.CENTER_VERTICAL;
     private Drawable expandedDrawable;
@@ -93,12 +94,13 @@ public class TreeViewList extends ListView {
     }
 
     private void syncAdapter() {
-        treeAdapter.setCollapsedDrawable(collapsedDrawable);
-        treeAdapter.setExpandedDrawable(expandedDrawable);
-        treeAdapter.setIndicatorGravity(indicatorGravity);
+//        treeAdapter.setCollapsedDrawable(collapsedDrawable); //TODO
+//        treeAdapter.setExpandedDrawable(expandedDrawable);
+//        treeAdapter.setIndicatorGravity(indicatorGravity);
+        Log.d("test", "syncAdapter "+indentWidth);
         treeAdapter.setIndentWidth(indentWidth);
-        treeAdapter.setIndicatorBackgroundDrawable(indicatorBackgroundDrawable);
-        treeAdapter.setRowBackgroundDrawable(rowBackgroundDrawable);
+//        treeAdapter.setIndicatorBackgroundDrawable(indicatorBackgroundDrawable);
+//        treeAdapter.setRowBackgroundDrawable(rowBackgroundDrawable);
         treeAdapter.setCollapsible(collapsible);
         if (handleTrackballPress) {
             setOnItemClickListener(new OnItemClickListener() {
@@ -140,6 +142,7 @@ public class TreeViewList extends ListView {
     }
 
     public void setIndentWidth(final int indentWidth) {
+        Log.d("test", "TreeViewList.setIndentWidth "+indentWidth);
         this.indentWidth = indentWidth;
         syncAdapter();
         treeAdapter.refresh();
