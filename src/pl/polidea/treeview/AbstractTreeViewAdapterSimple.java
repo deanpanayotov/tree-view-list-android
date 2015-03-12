@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -183,6 +182,7 @@ public abstract class AbstractTreeViewAdapterSimple<T> extends BaseAdapter imple
         return 0;
     }
 
+    @SuppressWarnings("deprecation")
     @SuppressLint("NewApi")
     public final LinearLayout populateTreeItem(final LinearLayout layout,
             final View childView, final TreeNodeInfo<T> nodeInfo,
@@ -209,13 +209,11 @@ public abstract class AbstractTreeViewAdapterSimple<T> extends BaseAdapter imple
     }
 
     protected int calculateIndentation(final TreeNodeInfo<T> nodeInfo) {
-        int width = getIndentWidth() * (nodeInfo.getLevel() + (collapsible ? 1 : 0));
-        Log.d("test", "getIndentWidth: "+getIndentWidth()+"w: "+width);
+        int width = getIndentWidth() * nodeInfo.getLevel();
         return width;
     }
 
     public void setIndentWidth(final int indentWidth) {
-        Log.d("test", "AbstractTreeViewAdapterSimple.setIndentWidth "+indentWidth);
         this.indentWidth = indentWidth;
     }
 
