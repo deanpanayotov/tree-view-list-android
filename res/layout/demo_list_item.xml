@@ -24,17 +24,4 @@
         android:textSize="24dp" >
     </TextView>
 
-    <CheckBox
-        android:id="@+id/demo_list_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:checked="false"
-        android:focusable="false"
-        android:focusableInTouchMode="true"
-        android:padding="0dip"
-        android:soundEffectsEnabled="true"
-        android:text="" >
-    </CheckBox>
-
 </LinearLayout>

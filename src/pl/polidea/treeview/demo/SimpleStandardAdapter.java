@@ -10,37 +10,16 @@ import pl.polidea.treeview.TreeStateManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
- * This is a very simple adapter that provides very basic tree view with a
- * checkboxes and simple item description.
+ * This is a very simple adapter that provides very basic tree view with simple item description.
  * 
  */
 class SimpleStandardAdapter extends AbstractTreeViewAdapter<Long> {
 
     private final Set<Long> selected;
-
-    private final OnCheckedChangeListener onCheckedChange = new OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(final CompoundButton buttonView,
-                final boolean isChecked) {
-            final Long id = (Long) buttonView.getTag();
-            changeSelected(isChecked, id);
-        }
-
-    };
-
-    private void changeSelected(final boolean isChecked, final Long id) {
-        if (isChecked) {
-            selected.add(id);
-        } else {
-            selected.remove(id);
-        }
-    }
 
     public SimpleStandardAdapter(final TreeViewListDemo treeViewListDemo,
             final Set<Long> selected,
@@ -72,16 +51,6 @@ class SimpleStandardAdapter extends AbstractTreeViewAdapter<Long> {
                 .findViewById(R.id.demo_list_item_level);
         descriptionView.setText(getDescription(treeNodeInfo.getId()));
         levelView.setText(Integer.toString(treeNodeInfo.getLevel()));
-        final CheckBox box = (CheckBox) viewLayout
-                .findViewById(R.id.demo_list_checkbox);
-        box.setTag(treeNodeInfo.getId());
-        if (treeNodeInfo.isWithChildren()) {
-            box.setVisibility(View.GONE);
-        } else {
-            box.setVisibility(View.VISIBLE);
-            box.setChecked(selected.contains(treeNodeInfo.getId()));
-        }
-        box.setOnCheckedChangeListener(onCheckedChange);
         return viewLayout;
     }
 
@@ -91,11 +60,6 @@ class SimpleStandardAdapter extends AbstractTreeViewAdapter<Long> {
         final TreeNodeInfo<Long> info = getManager().getNodeInfo(longId);
         if (info.isWithChildren()) {
             super.handleItemClick(view, id);
-        } else {
-            final ViewGroup vg = (ViewGroup) view;
-            final CheckBox cb = (CheckBox) vg
-                    .findViewById(R.id.demo_list_checkbox);
-            cb.performClick();
         }
     }
 
