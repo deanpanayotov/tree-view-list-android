@@ -49,15 +49,17 @@ public abstract class AbstractTreeViewAdapterSimple<T> extends BaseAdapter imple
     }
 
     protected void expandCollapse(final T id) {
-        final TreeNodeInfo<T> info = treeStateManager.getNodeInfo(id);
-        if (!info.isWithChildren()) {
-            // ignore - no default action
-            return;
-        }
-        if (info.isExpanded()) {
-            treeStateManager.collapseChildren(id);
-        } else {
-            treeStateManager.expandDirectChildren(id);
+        if(collapsible){
+            final TreeNodeInfo<T> info = treeStateManager.getNodeInfo(id);
+            if (!info.isWithChildren()) {
+                // ignore - no default action
+                return;
+            }
+            if (info.isExpanded()) {
+                treeStateManager.collapseChildren(id);
+            } else {
+                treeStateManager.expandDirectChildren(id);
+            }
         }
     }
 
