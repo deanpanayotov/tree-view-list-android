@@ -2,10 +2,8 @@ package pl.polidea.treeview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
@@ -16,27 +14,13 @@ import android.widget.ListView;
  * 
  * <pre>
  * attr ref pl.polidea.treeview.R.styleable#TreeViewList_collapsible
- * attr ref pl.polidea.treeview.R.styleable#TreeViewList_src_expanded
- * attr ref pl.polidea.treeview.R.styleable#TreeViewList_src_collapsed
  * attr ref pl.polidea.treeview.R.styleable#TreeViewList_indent_width
  * attr ref pl.polidea.treeview.R.styleable#TreeViewList_handle_trackball_press
- * attr ref pl.polidea.treeview.R.styleable#TreeViewList_indicator_gravity
- * attr ref pl.polidea.treeview.R.styleable#TreeViewList_indicator_background
- * attr ref pl.polidea.treeview.R.styleable#TreeViewList_row_background
  * </pre>
  */
 public class TreeViewList extends ListView {
-    private static final int DEFAULT_COLLAPSED_RESOURCE = R.drawable.collapsed;
-    private static final int DEFAULT_EXPANDED_RESOURCE = R.drawable.expanded;
     private static final int DEFAULT_INDENT = 60; //TODO dp
-    private static final int DEFAULT_GRAVITY = Gravity.LEFT
-            | Gravity.CENTER_VERTICAL;
-    private Drawable expandedDrawable;
-    private Drawable collapsedDrawable;
-    private Drawable rowBackgroundDrawable;
-    private Drawable indicatorBackgroundDrawable;
     private int indentWidth = 0;
-    private int indicatorGravity = 0;
     private AbstractTreeViewAdapterSimple<?> treeAdapter;
     private boolean collapsible;
     private boolean handleTrackballPress;
@@ -56,30 +40,14 @@ public class TreeViewList extends ListView {
     }
 
     private void parseAttributes(final Context context, final AttributeSet attrs) {
-        final TypedArray a = context.obtainStyledAttributes(attrs,
+        final TypedArray typedArray = context.obtainStyledAttributes(attrs,
                 R.styleable.TreeViewList);
-        expandedDrawable = a.getDrawable(R.styleable.TreeViewList_src_expanded);
-        if (expandedDrawable == null) {
-            expandedDrawable = context.getResources().getDrawable(
-                    DEFAULT_EXPANDED_RESOURCE);
-        }
-        collapsedDrawable = a
-                .getDrawable(R.styleable.TreeViewList_src_collapsed);
-        if (collapsedDrawable == null) {
-            collapsedDrawable = context.getResources().getDrawable(
-                    DEFAULT_COLLAPSED_RESOURCE);
-        }
-        indentWidth = a.getDimensionPixelSize(
-                R.styleable.TreeViewList_indent_width, DEFAULT_INDENT);
-        indicatorGravity = a.getInteger(
-                R.styleable.TreeViewList_indicator_gravity, DEFAULT_GRAVITY);
-        indicatorBackgroundDrawable = a
-                .getDrawable(R.styleable.TreeViewList_indicator_background);
-        rowBackgroundDrawable = a
-                .getDrawable(R.styleable.TreeViewList_row_background);
-        collapsible = a.getBoolean(R.styleable.TreeViewList_collapsible, true);
-        handleTrackballPress = a.getBoolean(
+        indentWidth = typedArray.getDimensionPixelSize(
+                R.styleable.TreeViewList_indent_width, DEFAULT_INDENT);  
+        collapsible = typedArray.getBoolean(R.styleable.TreeViewList_collapsible, true);
+        handleTrackballPress = typedArray.getBoolean(
                 R.styleable.TreeViewList_handle_trackball_press, true);
+        typedArray.recycle();
     }
 
     @Override
@@ -94,13 +62,8 @@ public class TreeViewList extends ListView {
     }
 
     private void syncAdapter() {
-//        treeAdapter.setCollapsedDrawable(collapsedDrawable); //TODO
-//        treeAdapter.setExpandedDrawable(expandedDrawable);
-//        treeAdapter.setIndicatorGravity(indicatorGravity);
         Log.d("test", "syncAdapter "+indentWidth);
         treeAdapter.setIndentWidth(indentWidth);
-//        treeAdapter.setIndicatorBackgroundDrawable(indicatorBackgroundDrawable);
-//        treeAdapter.setRowBackgroundDrawable(rowBackgroundDrawable);
         treeAdapter.setCollapsible(collapsible);
         if (handleTrackballPress) {
             setOnItemClickListener(new OnItemClickListener() {
@@ -116,40 +79,9 @@ public class TreeViewList extends ListView {
 
     }
 
-    public void setExpandedDrawable(final Drawable expandedDrawable) {
-        this.expandedDrawable = expandedDrawable;
-        syncAdapter();
-        treeAdapter.refresh();
-    }
-
-    public void setCollapsedDrawable(final Drawable collapsedDrawable) {
-        this.collapsedDrawable = collapsedDrawable;
-        syncAdapter();
-        treeAdapter.refresh();
-    }
-
-    public void setRowBackgroundDrawable(final Drawable rowBackgroundDrawable) {
-        this.rowBackgroundDrawable = rowBackgroundDrawable;
-        syncAdapter();
-        treeAdapter.refresh();
-    }
-
-    public void setIndicatorBackgroundDrawable(
-            final Drawable indicatorBackgroundDrawable) {
-        this.indicatorBackgroundDrawable = indicatorBackgroundDrawable;
-        syncAdapter();
-        treeAdapter.refresh();
-    }
-
     public void setIndentWidth(final int indentWidth) {
         Log.d("test", "TreeViewList.setIndentWidth "+indentWidth);
         this.indentWidth = indentWidth;
-        syncAdapter();
-        treeAdapter.refresh();
-    }
-
-    public void setIndicatorGravity(final int indicatorGravity) {
-        this.indicatorGravity = indicatorGravity;
         syncAdapter();
         treeAdapter.refresh();
     }
@@ -166,28 +98,8 @@ public class TreeViewList extends ListView {
         treeAdapter.refresh();
     }
 
-    public Drawable getExpandedDrawable() {
-        return expandedDrawable;
-    }
-
-    public Drawable getCollapsedDrawable() {
-        return collapsedDrawable;
-    }
-
-    public Drawable getRowBackgroundDrawable() {
-        return rowBackgroundDrawable;
-    }
-
-    public Drawable getIndicatorBackgroundDrawable() {
-        return indicatorBackgroundDrawable;
-    }
-
     public int getIndentWidth() {
         return indentWidth;
-    }
-
-    public int getIndicatorGravity() {
-        return indicatorGravity;
     }
 
     public boolean isCollapsible() {
